@@ -1,0 +1,12 @@
+pandas
+numpy
+nltk
+spacy
+scikit-learn
+torch
+transformers
+yfinance
+sqlalchemy
+psycopg2-binary
+matplotlib
+seaborn
