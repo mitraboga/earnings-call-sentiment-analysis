@@ -250,8 +250,6 @@ Call-level metrics (granularity: call):
 
 ---
 
----
-
 ## 📊 Power BI Dashboard — *Earnings Call Sentiment Analysis (Executive Overview)*
 
 This project isn’t just NLP in Python — the **Power BI layer is where raw text becomes decisions**.
