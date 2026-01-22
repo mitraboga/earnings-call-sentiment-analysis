@@ -591,14 +591,12 @@ VADER duplicate protection:
 
 ## 👤 Author
 
-<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-  <div style="font-size:18px; font-weight:700;">Mitra Boga</div>
-
-  <a href="https://www.linkedin.com/in/bogamitra/" target="_blank" rel="noopener noreferrer">
+<p align="center">
+  <b style="font-size:18px;">Mitra Boga</b><br/><br/>
+  <a href="https://www.linkedin.com/in/bogamitra/" target="_blank">
     <img src="https://img.shields.io/badge/LinkedIn-bogamitra-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
   </a>
-
-  <a href="https://x.com/techtraboga" target="_blank" rel="noopener noreferrer">
+  <a href="https://x.com/techtraboga" target="_blank">
     <img src="https://img.shields.io/badge/X-@techtraboga-111111?style=for-the-badge&logo=x&logoColor=white" />
   </a>
-</div>
+</p>
