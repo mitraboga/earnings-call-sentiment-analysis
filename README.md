@@ -250,78 +250,218 @@ Call-level metrics (granularity: call):
 
 ---
 
-## Power BI Dashboard (technical build + how it works)
+---
 
-File:
-- NLP-Dashboard.pbix
+## 📊 Power BI Dashboard — *Earnings Call Sentiment Analysis (Executive Overview)*
 
-This dashboard is designed to be fast and scalable by using **pre-aggregated CSV outputs** generated in Python
-(instead of forcing Power BI to perform heavy NLP / large-group aggregations).
+This project isn’t just NLP in Python — the **Power BI layer is where raw text becomes decisions**.
 
-### Data sources used (the dashboard inputs)
-1) data/processed/powerbi_call_level_metrics.csv
-   - One row per call (symbol + year + quarter + date)
+The dashboard turns thousands of earnings-call speaker blocks into **executive-ready KPIs**, letting you:
+- spot **sentiment shifts** over time (quarter-to-quarter),
+- compare **Management vs Analyst tone** (credibility vs skepticism),
+- separate **Prepared Remarks vs Q&A** (scripted vs spontaneous),
+- and drill into **outliers + confidence** using purpose-built tooltips.
 
-2) data/processed/powerbi_role_level_metrics.csv
-   - One row per (call + speaker_role)
+> **Business impact (real world):**  
+> Sentiment signals can act like an “early-warning system” for guidance risk, investor expectations, PR issues, or competitive pressure — especially when **Management’s tone diverges from Analysts’ tone**.
 
-### Data model approach (recommended)
-In Model view, use a simple relationship:
-- powerbi_call_level_metrics (1) → (many) powerbi_role_level_metrics
+---
 
-Join keys (from the pipeline):
-- symbol, year, quarter, date
-(Optional: company_name, if consistent)
+## 🧠 What the Dashboard Measures (in plain English)
 
-Best practice (cleaner):
-- Create a single `call_id` column in Power Query on BOTH tables:
-  call_id = symbol & "-" & year & "-" & quarter & "-" & date
-- Relate tables on `call_id` instead of multi-column joins
+**Two sentiment engines, two perspectives:**
+- **VADER (lexicon-based):** fast, rule-based sentiment score (range: **-1 to +1**) on cleaned text blocks.
+- **FinBERT (finance-tuned transformer):** classifies sentiment (**positive / neutral / negative**) with a **confidence score**.
 
-### Power Query (Transform Data) technical steps
-Typical steps applied when importing:
-- Set data types:
-  - date → Date
-  - year / quarter → Whole number or Text (depending on visuals)
-  - sentiment metrics → Decimal number
-- Validate nulls:
-  - gap metrics may be blank when analyst or management rows are missing
-- Optional (advanced):
-  - create a Date table for proper time intelligence (YoY, QoQ)
+**Core metrics surfaced in Power BI:**
+- **Avg FinBERT** (call-level mean score derived from FinBERT labels)
+- **Avg VADER** (call-level mean compound)
+- **Avg Confidence** (mean FinBERT confidence)
+- **Sentiment Mix** (% Positive / Neutral / Negative)
+- **Role Gap** (**Management − Analyst**) using both VADER + FinBERT
+- **QoQ Δ** (quarter-over-quarter change for sentiment)
 
-### DAX measures (lightweight because Python did the heavy lift)
-Because metrics are precomputed, DAX can stay clean and readable.
+---
 
-Examples:
-- Avg Call VADER:
-  Avg Call VADER = AVERAGE(powerbi_call_level_metrics[vader_mean])
+## 🧩 Data Model + How It’s Wired
 
-- Avg Call FinBERT:
-  Avg Call FinBERT = AVERAGE(powerbi_call_level_metrics[finbert_mean])
+This dashboard is backed by the pipeline outputs generated from Python:
 
-- Avg Mgmt vs Analyst Gap (VADER):
-  Avg VADER Gap (Mgmt-Analyst) = AVERAGE(powerbi_call_level_metrics[vader_gap_mgmt_minus_analyst])
+- `data/processed/powerbi_call_level_metrics.csv`  
+  **One row per earnings call** (company + quarter + date), with aggregate sentiment metrics.
 
-- Avg % Positive (FinBERT):
-  Avg FinBERT % Positive = AVERAGE(powerbi_call_level_metrics[finbert_pos])
+- `data/processed/powerbi_role_level_metrics.csv`  
+  **One row per call + role (+ section)** with role-specific aggregates (Management / Analyst / Operator).
 
-- Total Blocks:
-  Total Blocks = SUM(powerbi_role_level_metrics[blocks])
+**Model design highlights:**
+- Two fact tables (**Call-level** + **Role-level**) connected via a shared **CallKey** logic (and aligned on call dimensions like symbol/year/quarter/date).
+- A small `DimSection` table (Prepared Remarks vs Q&A) enabling clean section filtering.
+- Dedicated tooltip helper tables (`TT_*`) + a measures table enabling:
+  - dynamic tooltip titles,
+  - confidence badges,
+  - context-aware drilldowns without cluttering the main page.
 
-### What the dashboard enables (analysis patterns)
-With these two tables, the dashboard can support:
-- KPI cards (avg sentiment, proportions, confidence, volume)
-- time trends (sentiment over time by company/quarter)
-- role comparisons (management vs analyst vs other)
-- distribution visuals (FinBERT positive/neutral/negative)
-- gap analysis (mgmt-minus-analyst divergence per call)
+---
 
-### Refresh workflow
-1) Run the Python pipeline to regenerate CSVs in data/processed/
-2) Open NLP-Dashboard.pbix
-3) Power BI → Transform Data → Data Source Settings
-4) Confirm file paths point to your local data/processed/ folder
-5) Refresh
+## 🖥️ Report Page Walkthrough (What each visual answers)
+
+### 1) KPI Banner (Top)
+Quick “executive snapshot” of the current filter context:
+- **Total Calls**
+- **Avg FinBERT**
+- **Avg VADER**
+- **Avg Confidence**
+
+### 2) Earnings Call Sentiment Trend (Line)
+Answers: **“Is sentiment improving or deteriorating over time?”**  
+Plots FinBERT + VADER trends across quarters and lets users hover for deeper breakdowns.
+
+### 3) Management vs Analyst Sentiment (Bar)
+Answers: **“Who’s more optimistic — leadership or the Street?”**  
+This is the **credibility / tension signal**. A widening gap can indicate:
+- management optimism not matched by analyst belief,
+- increased skepticism during Q&A,
+- “tone-management” vs real fundamentals.
+
+### 4) Prepared Remarks vs Q&A (Comparison)
+Answers: **“Does sentiment drop when the script ends?”**  
+Prepared remarks are controlled; Q&A is where risk shows up.
+
+### 5) Sentiment Distribution (Donut)
+Answers: **“What’s the overall tone mix?”**  
+Shows the % split of positive/neutral/negative sentiment under the current slicers.
+
+---
+
+## 🧠 Tooltips (Deep Insights Without Cluttering the Dashboard)
+
+Power BI tooltips are the “secret weapon” in this report:  
+you keep the main dashboard clean, while hover interactions reveal the real diagnostics.
+
+### ✅ Tooltip #1 — Role Gap + Percentile
+Shows:
+- **FinBERT Gap** and **VADER Gap** (Management − Analyst)
+- **Gap Percentile Label** (how extreme the gap is vs historical distribution)
+- Role-level matrix with:
+  - Sentiment (FinBERT & VADER)
+  - Delta metrics (contextual shifts)
+- Confidence badge (**High / Medium / Low**) based on FinBERT confidence.
+
+**Why it matters:**  
+A gap with **high confidence** is actionable — it means the divergence is consistent across blocks, not noise.
+
+### ✅ Tooltip #2 — Sentiment Mix + Baseline Delta
+Shows:
+- % **Positive / Neutral / Negative**
+- “**vs Company Average**” uplift (contextual benchmark)
+- A baseline delta chart showing how the selected context differs from normal.
+
+**Why it matters:**  
+This lets you separate:
+- “This quarter is positive”  
+from  
+- “This quarter is positive **relative to what’s typical for this company**.”
+
+### ✅ Tooltip #3 — QoQ Δ + Extremes (Best/Worst Calls)
+Shows:
+- **FinBERT QoQ Δ** and **VADER QoQ Δ**
+- Volume context (**# blocks**, **# calls**)
+- **Sentiment Mix**
+- **Best / Worst CallKeys** within the quarter (outlier detection)
+- Confidence badge (High/Medium/Low)
+
+**Why it matters:**  
+This instantly surfaces “what changed” *and* “which calls drove it.”
+
+---
+
+## 🖼️ How to Add Your Screenshots into this README (Copy/Paste)
+
+### Step 1 — Create a folder in your repo
+Create:
+
+`assets/powerbi/`
+
+Put your screenshots inside it and rename them like this (recommended):
+
+- `assets/powerbi/dashboard_overview.png`
+- `assets/powerbi/table_call_level.png`
+- `assets/powerbi/table_role_level.png`
+- `assets/powerbi/model_view.png`
+
+Tooltips (full pages):
+- `assets/powerbi/tooltip_1_role_gap.png`
+- `assets/powerbi/tooltip_2_baseline.png`
+- `assets/powerbi/tooltip_3_extremes.png`
+
+Tooltip interactions (the 3 screenshots you said you’ll use in the README):
+- `assets/powerbi/tooltip_interaction_baseline.png`
+- `assets/powerbi/tooltip_interaction_role_gap.png`
+- `assets/powerbi/tooltip_interaction_extremes.png`
+
+### Step 2 — Paste these image embeds
+
+#### Executive Overview (Report View)
+<img src="assets/powerbi/dashboard_overview.png" width="1000" />
+
+#### Data Tables (Call-Level + Role-Level)
+<details>
+  <summary><b>Click to expand (Table View + Model View)</b></summary>
+  <br/>
+
+  <b>Call-Level Metrics Table</b><br/>
+  <img src="assets/powerbi/table_call_level.png" width="1000" />
+  <br/><br/>
+
+  <b>Role-Level Metrics Table</b><br/>
+  <img src="assets/powerbi/table_role_level.png" width="1000" />
+  <br/><br/>
+
+  <b>Model View (Relationships + Tooltip Helper Tables)</b><br/>
+  <img src="assets/powerbi/model_view.png" width="1000" />
+</details>
+
+#### Tooltips (Full Pages)
+<details>
+  <summary><b>Click to expand (Tooltip Pages)</b></summary>
+  <br/>
+
+  <b>Tooltip #1 — Role Gap + Percentile</b><br/>
+  <img src="assets/powerbi/tooltip_1_role_gap.png" width="1000" />
+  <br/><br/>
+
+  <b>Tooltip #2 — Mix + Baseline Delta</b><br/>
+  <img src="assets/powerbi/tooltip_2_baseline.png" width="1000" />
+  <br/><br/>
+
+  <b>Tooltip #3 — QoQ Δ + Extremes</b><br/>
+  <img src="assets/powerbi/tooltip_3_extremes.png" width="1000" />
+</details>
+
+#### Tooltips in Action (Hover Interactions)
+These are the “money shots” — they prove the dashboard is interactive and insight-dense.
+
+<p>
+  <img src="assets/powerbi/tooltip_interaction_role_gap.png" width="320" />
+  <img src="assets/powerbi/tooltip_interaction_baseline.png" width="320" />
+  <img src="assets/powerbi/tooltip_interaction_extremes.png" width="320" />
+</p>
+
+---
+
+## ✅ How to Use the Dashboard (1-minute guide)
+
+1. Pick a **Company** (or compare multiple).
+2. Filter by **Year / Quarter**.
+3. Toggle **Prepared Remarks vs Q&A** for “scripted vs real”.
+4. Hover any key visual to open **tooltips**:
+   - Role Gap diagnostics
+   - Baseline deltas vs company norm
+   - QoQ change + best/worst calls
+5. Use the tooltip insights to answer:
+   - “Is sentiment moving?”
+   - “Is leadership credibility aligned with analysts?”
+   - “Where are the outliers and how confident are we?”
 
 ---
 
