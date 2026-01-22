@@ -482,7 +482,7 @@ These three screenshots show the tooltips activating directly from the Executive
 
 ---
 
-## ⚡ Key Insights You Can Pull in 60 Seconds (How to *actually* use this)
+## ⚡ Key Insights That Can Be Pulled in 60 Seconds (How to *actually* use this)
 
 Use these as “executive questions” — each one maps directly to a slicer + a visual + a tooltip.
 
