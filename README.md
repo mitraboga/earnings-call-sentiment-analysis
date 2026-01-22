@@ -1,48 +1,53 @@
-# 📞 S&P 500 Earnings Call Sentiment Analysis (VADER + FinBERT) → Power BI Dashboard
+# 📞 S&P 500 Earnings Call Sentiment Analysis (VADER + FinBERT) → Power BI Intelligence Dashboard
 
 Turn raw earnings-call transcripts into **decision-grade sentiment metrics** that quantify how **management, analysts, and the market narrative** evolve over time.
 
 This repository builds an end-to-end NLP pipeline that produces:
-- ✅ Clean **speaker-level text blocks**
+- ✅ **Clean speaker-level text blocks**
 - ✅ **Speaker role labeling** (Management / Analyst / Operator / Other)
-- ✅ Dual-model sentiment scoring:
+- ✅ **Dual-model sentiment scoring**
   - **VADER** (fast, rule-based baseline)
   - **FinBERT** (finance-domain transformer)
-- ✅ **Power BI-ready metrics tables** (call-level + role-level)
+- ✅ **Power BI-ready metrics tables**
 - ✅ A Power BI dashboard: `NLP-Dashboard.pbix`
 
 ---
 
-## Why this matters (real business consequences)
+## Why this matters (real business impact)
 
-Earnings calls aren’t “just text.” They’re strategic communication events that shape:
-- Investor confidence and expectations
-- Risk perception (uncertainty, hedging, cautious language)
-- Market narratives (how results are framed, not just what they are)
-- Competitive positioning (tone vs peers across the same period)
+Earnings calls are not “just text.” They are strategic communication events that influence:
+- **Investor confidence**
+- **Risk perception**
+- **Market narratives**
+- **Competitive positioning**
 
 ### What sentiment analysis unlocks
-Sentiment transforms qualitative language into measurable KPIs, helping detect:
-- **Confidence vs caution** (positive → neutral/negative tone drift)
-- **Uncertainty** (hedging language often spikes in weak quarters)
-- **Pressure dynamics** (analyst tone vs management tone)
-- **Narrative momentum** (tone trend across quarters/years)
+Sentiment scoring helps detect changes in:
+- **Confidence vs caution** (tone shifting positive → neutral/negative)
+- **Uncertainty language** (hedging, vague guidance)
+- **Pressure dynamics** (analysts pushing back vs management defending)
+- **Narrative momentum** across quarters and companies
 
-### How NLP / AI / ML Engineers create business value
-This project demonstrates the core engineering value loop:
+### Real-world business advantages
+These insights can support:
+- **Investor Relations (IR):** refine messaging; identify where investors are unconvinced
+- **Equity Research:** add consistent sentiment KPIs to qualitative call notes
+- **Risk / Compliance:** flag unusually negative calls for deeper review
+- **Portfolio strategy:** compare narrative trend across companies and time
+- **Competitive intelligence:** benchmark management confidence vs peers
 
-**Raw text → structured speaker blocks → model scoring → aggregated KPIs → dashboard for decision-making**
+### What this proves as an NLP / AI / ML engineering project
+This repo demonstrates the core value loop:
 
-NLP engineers help businesses by:
-- Converting messy unstructured data into clean, analysis-ready datasets
-- Designing pipelines that scale (chunking, checkpointing, reproducibility)
-- Selecting and operationalizing models (baseline + domain transformer)
-- Producing metrics that stakeholders can use in BI tools and reports
+**Raw text → structured speaker blocks → model scoring → aggregated KPIs → business dashboard**
+
+That’s exactly how NLP engineers turn unstructured language into **measurable metrics** that guide decisions.
 
 ---
 
-## Repo Structure (matches the repo)
+## Repo Structure (matches your actual repo)
 
+```text
 .
 ├── data/
 │   ├── raw/
