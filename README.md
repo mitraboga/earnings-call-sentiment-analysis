@@ -252,6 +252,8 @@ Call-level metrics (granularity: call):
 
 ## 📊 Power BI Dashboard — *Earnings Call Sentiment Analysis (Executive Overview)*
 
+The Python pipeline produces sentiment metrics — but the **Power BI report is the “decision layer”** that makes those metrics usable in real business workflows.
+
 This project isn’t just NLP in Python — the **Power BI layer is where raw text becomes decisions**.
 
 The dashboard turns thousands of earnings-call speaker blocks into **executive-ready KPIs**, letting you:
@@ -265,185 +267,309 @@ The dashboard turns thousands of earnings-call speaker blocks into **executive-r
 
 ---
 
-## 🧠 What the Dashboard Measures (in plain English)
+## Exhibit 1 — Executive Overview (Report View)
 
-**Two sentiment engines, two perspectives:**
-- **VADER (lexicon-based):** fast, rule-based sentiment score (range: **-1 to +1**) on cleaned text blocks.
-- **FinBERT (finance-tuned transformer):** classifies sentiment (**positive / neutral / negative**) with a **confidence score**.
+<img src="assets/powerbi/dashboard_overview.png" width="1000" />
 
-**Core metrics surfaced in Power BI:**
-- **Avg FinBERT** (call-level mean score derived from FinBERT labels)
-- **Avg VADER** (call-level mean compound)
-- **Avg Confidence** (mean FinBERT confidence)
-- **Sentiment Mix** (% Positive / Neutral / Negative)
-- **Role Gap** (**Management − Analyst**) using both VADER + FinBERT
-- **QoQ Δ** (quarter-over-quarter change for sentiment)
+### What the page answers (in 10 seconds)
+1) **What’s the overall tone right now?**  
+2) **Is sentiment improving or deteriorating over time?**  
+3) **Is Management more optimistic than Analysts (or vice versa)?**  
+4) **Does sentiment change when we move from scripted Prepared Remarks → spontaneous Q&A?**  
+5) **What’s the distribution of positive / neutral / negative sentiment?**
 
----
+### Filters (left panel)
+- **Company** slicer (single or multi-select)
+- **Year** slicer
+- **Quarter** slicer
+- **Section** slicer: **Prepared Remarks** vs **Q&A**  
+  (this is critical — Q&A is where uncertainty and tension usually shows up)
 
-## 🧩 Data Model + How It’s Wired
-
-This dashboard is backed by the pipeline outputs generated from Python:
-
-- `data/processed/powerbi_call_level_metrics.csv`  
-  **One row per earnings call** (company + quarter + date), with aggregate sentiment metrics.
-
-- `data/processed/powerbi_role_level_metrics.csv`  
-  **One row per call + role (+ section)** with role-specific aggregates (Management / Analyst / Operator).
-
-**Model design highlights:**
-- Two fact tables (**Call-level** + **Role-level**) connected via a shared **CallKey** logic (and aligned on call dimensions like symbol/year/quarter/date).
-- A small `DimSection` table (Prepared Remarks vs Q&A) enabling clean section filtering.
-- Dedicated tooltip helper tables (`TT_*`) + a measures table enabling:
-  - dynamic tooltip titles,
-  - confidence badges,
-  - context-aware drilldowns without cluttering the main page.
-
----
-
-## 🖥️ Report Page Walkthrough (What each visual answers)
-
-### 1) KPI Banner (Top)
-Quick “executive snapshot” of the current filter context:
+### KPI Banner (top row)
+The banner is the “exec summary” for the current filter context:
 - **Total Calls**
 - **Avg FinBERT**
 - **Avg VADER**
 - **Avg Confidence**
 
-### 2) Earnings Call Sentiment Trend (Line)
-Answers: **“Is sentiment improving or deteriorating over time?”**  
-Plots FinBERT + VADER trends across quarters and lets users hover for deeper breakdowns.
-
-### 3) Management vs Analyst Sentiment (Bar)
-Answers: **“Who’s more optimistic — leadership or the Street?”**  
-This is the **credibility / tension signal**. A widening gap can indicate:
-- management optimism not matched by analyst belief,
-- increased skepticism during Q&A,
-- “tone-management” vs real fundamentals.
-
-### 4) Prepared Remarks vs Q&A (Comparison)
-Answers: **“Does sentiment drop when the script ends?”**  
-Prepared remarks are controlled; Q&A is where risk shows up.
-
-### 5) Sentiment Distribution (Donut)
-Answers: **“What’s the overall tone mix?”**  
-Shows the % split of positive/neutral/negative sentiment under the current slicers.
+Example shown in your screenshot context (AAPL):
+- **Total Calls: 10**
+- **Avg FinBERT: 0.73**
+- **Avg VADER: 0.77**
+- **Avg Confidence: 0.82**
 
 ---
 
-## 🧠 Tooltips (Deep Insights Without Cluttering the Dashboard)
+## Exhibit 2 — The Data Backbone (Call-Level vs Role-Level Tables)
 
-Power BI tooltips are the “secret weapon” in this report:  
-you keep the main dashboard clean, while hover interactions reveal the real diagnostics.
+These are the two tables your Python pipeline exports and Power BI consumes:
 
-### ✅ Tooltip #1 — Role Gap + Percentile
-Shows:
-- **FinBERT Gap** and **VADER Gap** (Management − Analyst)
-- **Gap Percentile Label** (how extreme the gap is vs historical distribution)
-- Role-level matrix with:
-  - Sentiment (FinBERT & VADER)
-  - Delta metrics (contextual shifts)
-- Confidence badge (**High / Medium / Low**) based on FinBERT confidence.
-
-**Why it matters:**  
-A gap with **high confidence** is actionable — it means the divergence is consistent across blocks, not noise.
-
-### ✅ Tooltip #2 — Sentiment Mix + Baseline Delta
-Shows:
-- % **Positive / Neutral / Negative**
-- “**vs Company Average**” uplift (contextual benchmark)
-- A baseline delta chart showing how the selected context differs from normal.
-
-**Why it matters:**  
-This lets you separate:
-- “This quarter is positive”  
-from  
-- “This quarter is positive **relative to what’s typical for this company**.”
-
-### ✅ Tooltip #3 — QoQ Δ + Extremes (Best/Worst Calls)
-Shows:
-- **FinBERT QoQ Δ** and **VADER QoQ Δ**
-- Volume context (**# blocks**, **# calls**)
-- **Sentiment Mix**
-- **Best / Worst CallKeys** within the quarter (outlier detection)
-- Confidence badge (High/Medium/Low)
-
-**Why it matters:**  
-This instantly surfaces “what changed” *and* “which calls drove it.”
-
----
-
-## 🖼️ How to Add Your Screenshots into this README (Copy/Paste)
-
-### Step 1 — Create a folder in your repo
-Create:
-
-`assets/powerbi/`
-
-Put your screenshots inside it and rename them like this (recommended):
-
-- `assets/powerbi/dashboard_overview.png`
-- `assets/powerbi/table_call_level.png`
-- `assets/powerbi/table_role_level.png`
-- `assets/powerbi/model_view.png`
-
-Tooltips (full pages):
-- `assets/powerbi/tooltip_1_role_gap.png`
-- `assets/powerbi/tooltip_2_baseline.png`
-- `assets/powerbi/tooltip_3_extremes.png`
-
-Tooltip interactions (the 3 screenshots you said you’ll use in the README):
-- `assets/powerbi/tooltip_interaction_baseline.png`
-- `assets/powerbi/tooltip_interaction_role_gap.png`
-- `assets/powerbi/tooltip_interaction_extremes.png`
-
-### Step 2 — Paste these image embeds
-
-#### Executive Overview (Report View)
-<img src="assets/powerbi/dashboard_overview.png" width="1000" />
-
-#### Data Tables (Call-Level + Role-Level)
 <details>
-  <summary><b>Click to expand (Table View + Model View)</b></summary>
+  <summary><b>Click to expand (Tables)</b></summary>
   <br/>
 
-  <b>Call-Level Metrics Table</b><br/>
+  <b>Call-Level Metrics Table (one row per earnings call)</b><br/>
   <img src="assets/powerbi/table_call_level.png" width="1000" />
   <br/><br/>
 
-  <b>Role-Level Metrics Table</b><br/>
+  <b>Role-Level Metrics Table (one row per call + role + section)</b><br/>
   <img src="assets/powerbi/table_role_level.png" width="1000" />
-  <br/><br/>
+</details>
 
-  <b>Model View (Relationships + Tooltip Helper Tables)</b><br/>
+### Call-Level table includes
+- volume context (**total_blocks**, **avg_block_len**)
+- sentiment aggregates (**vader_mean**, **finbert_mean**)
+- mix metrics (**finbert_pos / finbert_neu / finbert_neg**)
+- reliability signal (**finbert_avg_conf**)
+- divergence signals (**vader_gap_mgmt_minus_analyst**, **finbert_gap_mgmt_minus_analyst**)
+- traceability ID (**CallKey**) used in tooltips for “best/worst call” surfacing
+
+### Role-Level table includes
+- role splits (**Analyst / Management / Operator**)
+- section splits (**Prepared Remarks / Q&A**)
+- role-level sentiment means + medians (e.g., **vader_median**)
+- role-level confidence
+
+---
+
+## Exhibit 3 — Model View (and why the tooltips work)
+
+<details>
+  <summary><b>Click to expand (Relational Model)</b></summary>
   <img src="assets/powerbi/model_view.png" width="1000" />
 </details>
 
-#### Tooltips (Full Pages)
+### What’s happening here (technical, but clean)
+- Two primary fact tables:
+  - `powerbi_call_level_metrics_v2`
+  - `powerbi_role_level_metrics_v2`
+- `DimSection` supports clean filtering for **Prepared Remarks vs Q&A**
+- A dedicated `MeasuresTable` centralizes KPI logic and tooltip logic
+- Several small **tooltip helper tables** (TT_*) exist purely to power tooltip layouts:
+  - `TT Role`, `TT Sentiment`, `TT Axis`, `TT Extremes`
+
+This structure lets you build tooltips that feel like “mini dashboards” without polluting the main model.
+
+---
+
+# ⭐ The Real Differentiator: Tooltips That Think
+
+You built **3 tooltip pages** that activate on hover from the main dashboard.
+These tooltips don’t just repeat visible charts — they provide **diagnostics**:
+- role divergence
+- percentile ranking
+- baseline deltas vs company norm
+- QoQ momentum
+- call extremes (best/worst) with CallKey traceability
+- confidence classification (high / medium / low)
+
+---
+
+## Tooltip #1 — Role Gap + Gap Percentile (Divergence Diagnostics)
+
 <details>
-  <summary><b>Click to expand (Tooltip Pages)</b></summary>
-  <br/>
-
-  <b>Tooltip #1 — Role Gap + Percentile</b><br/>
-  <img src="assets/powerbi/tooltip_1_role_gap.png" width="1000" />
-  <br/><br/>
-
-  <b>Tooltip #2 — Mix + Baseline Delta</b><br/>
-  <img src="assets/powerbi/tooltip_2_baseline.png" width="1000" />
-  <br/><br/>
-
-  <b>Tooltip #3 — QoQ Δ + Extremes</b><br/>
-  <img src="assets/powerbi/tooltip_3_extremes.png" width="1000" />
+  <summary><b>Click to expand (Tooltip #1)</b></summary>
+  <img src="assets/powerbi/tooltip_1_role_gap.png" width="500" />
 </details>
 
-#### Tooltips in Action (Hover Interactions)
-These are the “money shots” — they prove the dashboard is interactive and insight-dense.
+### What it shows
+- **FinBERT Gap** and **VADER Gap** (Management − Analyst)
+- **Gap Percentile Label** (how extreme the divergence is)
+- A **Role Insights** table that breaks down:
+  - `Sentiment (FinBERT)`
+  - `Sentiment (VADER)`
+  - `Delta (VADER)`
+  - `Delta (FinBERT)`
+- Confidence badge:
+  - ✅ **High confidence**
+  - ⚠️ **Medium confidence**
+  - ❌ **Low confidence**
 
-<p>
-  <img src="assets/powerbi/tooltip_interaction_role_gap.png" width="320" />
-  <img src="assets/powerbi/tooltip_interaction_baseline.png" width="320" />
-  <img src="assets/powerbi/tooltip_interaction_extremes.png" width="320" />
-</p>
+Example shown:
+- **FinBERT Gap = -0.02**
+- **VADER Gap = -0.01**
+- **Gap Percentile Label = 38th%**
+- Analyst vs Management (FinBERT): **0.80 vs 0.78**
+- Analyst vs Management (VADER): **0.85 vs 0.84**
+- Confidence: ✅ **High confidence**
+
+### Why it matters (business)
+A divergence between Management and Analysts can signal:
+- credibility gaps,
+- skepticism in Q&A,
+- uncertainty not reflected in scripted remarks,
+- narrative management vs fundamentals.
+
+---
+
+## Tooltip #2 — Sentiment Mix + “Δ vs Company Baseline”
+
+<details>
+  <summary><b>Click to expand (Tooltip #2)</b></summary>
+  <img src="assets/powerbi/tooltip_2_baseline.png" width="500" />
+</details>
+
+### What it shows
+- Distribution cards:
+  - **+ve Label**
+  - **Neutral Label**
+  - **-ve Label**
+- Benchmarking cards:
+  - **vs Company Avg.**
+  - **Δ** (change vs baseline)
+- A mini chart: **Δ vs Company Baseline**
+  (how the current context differs from the company’s normal tone)
+
+Example interaction (AAPL • All • Positive):
+- **+ve Label: 86%**
+- **Neutral Label: 1%**
+- **-ve Label: 13%**
+- **+73% vs Company Avg.**
+- Baseline deltas show directionality by bucket:
+  - Positive: **+0.013**
+  - Negative: **-0.004**
+  - Neutral: **-0.009**
+
+### Why it matters (business)
+This prevents the classic analytics mistake:
+> “This quarter is positive”  
+instead of  
+> “This quarter is positive **relative to this company’s baseline behavior**.”
+
+It tells you if the tone is *actually unusual* or just “business as usual” for that company.
+
+---
+
+## Tooltip #3 — QoQ Momentum + Call Extremes (Best/Worst CallKey)
+
+<details>
+  <summary><b>Click to expand (Tooltip #3)</b></summary>
+  <img src="assets/powerbi/tooltip_3_extremes.png" width="500" />
+</details>
+
+### What it shows
+- Momentum cards:
+  - **FinBERT QoQ Δ**
+  - **VADER QoQ Δ**
+- Scale context:
+  - **blocks**
+  - **calls**
+- **Sentiment Mix** stacked bar (Negative / Neutral / Positive)
+- **Call Extremes (within Quarter)**:
+  - `Best` + `Worst` surfaced using **Extreme CallKey**
+  - includes FinBERT label strength + traceability
+
+Example shown in tooltip page:
+- **FinBERT QoQ Δ: +0.80**
+- **VADER QoQ Δ: +0.84**
+- **5,513 blocks**
+- **175 calls**
+- Call Extremes:
+  - Best: **ADBE-20211216-2021Q4** (FinBERT Label: **1.00**)
+  - Worst: **ABT-20220419-2022Q1** (FinBERT Label: **0.06**)
+- Confidence: ✅ **High confidence**
+
+### Why it matters (business)
+This is the “so what?” tooltip:
+- what changed (QoQ),
+- how strong the change is (distribution),
+- and which calls created the movement (extremes).
+
+---
+
+# 🖱️ Tooltips in Action (Interaction Proof)
+
+These three screenshots show the tooltips activating directly from the Executive Overview page.
+
+<details>
+  <summary><b>Click to expand (Tables)</b></summary>
+  <br/>
+
+  <b>Call-Level Metrics Table (one row per earnings call)</b><br/>
+  <img src="assets/powerbi/interaction_role_gap.png" width="1000" />
+  <br/><br/>
+
+  <b>Role-Level Metrics Table (one row per call + role + section)</b><br/>
+  <img src="assets/powerbi/tooltip_interaction_baseline.png" width="1000" />
+
+  <b>Role-Level Metrics Table (one row per call + role + section)</b><br/>
+  <img src="assets/powerbi/interaction_extremes.png" width="1000" />
+</details>
+
+### What these “money shots” prove (to recruiters + stakeholders)
+- The dashboard is **not static** — it’s interactive and context-aware.
+- Hovering passes filter context into tooltip pages (company/quarter/section/sentiment bucket).
+- The tooltips behave like **mini dashboards**:
+  - Example (AAPL • Q3 • Positive): ❌ **Low confidence**
+    - **FinBERT Gap: +0.13**
+    - **VADER Gap: -0.21**
+    - **Gap Percentile: 50th%**
+    - Role matrix shows cross-model disagreement patterns (FinBERT vs VADER).
+  - Example (ABBV): ⚠️ **Medium confidence**
+    - **FinBERT QoQ Δ: +0.73**
+    - **VADER QoQ Δ: +0.90**
+    - **83 blocks**, **2 calls**
+    - Extremes surfaced via CallKey:
+      - Best: **ABBV-20210203-2020Q4** (0.80)
+      - Worst: **ABBV-20240202-2023Q4** (0.67)
+
+---
+
+## ⚡ Key Insights You Can Pull in 60 Seconds (How to *actually* use this)
+
+Use these as “executive questions” — each one maps directly to a slicer + a visual + a tooltip.
+
+### 1) “Is sentiment trending up or down — and is it reliable?”
+- **Where to look:** KPI Banner + **Earnings Call Sentiment Trend**
+- **What to check:**  
+  - Avg FinBERT / Avg VADER direction over time  
+  - **Avg Confidence** (high confidence = signal, low confidence = caution)
+
+### 2) “Is Management’s optimism aligned with Analyst skepticism?”
+- **Where to look:** **Management vs Analyst Sentiment** bar chart  
+- **Then hover:** **Tooltip #1 (Role Gap + Percentile)**
+- **What to check:**  
+  - **FinBERT Gap** + **VADER Gap** (Mgmt − Analyst)  
+  - **Gap Percentile Label** (is the divergence extreme or normal?)
+
+### 3) “Does the tone shift when the script ends?”
+- **Where to look:** **Prepared Remarks vs Q&A** comparison chart  
+- **How:** toggle **Section** slicer (Prepared Remarks vs Q&A)
+- **What to check:**  
+  - If Q&A sentiment drops while Prepared stays high → potential uncertainty / pressure.
+
+### 4) “Is this quarter ‘good’… or just normal for this company?”
+- **Where to look:** Hover any relevant context → **Tooltip #2 (Δ vs Company Baseline)**
+- **What to check:**  
+  - **+ve / Neutral / -ve Label** percentages  
+  - **vs Company Avg.** uplift  
+  - Baseline deltas by bucket (Positive/Neutral/Negative)
+
+### 5) “What changed quarter-over-quarter (momentum), and what drove it?”
+- **Where to look:** Hover the trend or quarter context → **Tooltip #3 (QoQ Δ + Extremes)**
+- **What to check:**  
+  - **FinBERT QoQ Δ** and **VADER QoQ Δ**  
+  - **blocks** + **calls** (sample size)  
+  - **Call Extremes (Best/Worst CallKey)** to identify the exact calls moving the metric
+
+### 6) “Are the models agreeing or disagreeing?”
+- **Where to look:** **Tooltip #1 Role Insights table**
+- **What to check:**  
+  - If FinBERT is strongly positive but VADER is negative (or vice versa), treat as a **language-style edge case**  
+  - Use the **confidence badge** (High/Medium/Low) to decide whether to trust the label
+
+### 7) “Are we seeing a ‘confidence problem’ (noisy signal)?”
+- **Where to look:** KPI Banner (**Avg Confidence**) + tooltip confidence badges  
+- **What to check:**  
+  - If confidence is low, prefer directional trends + larger sample contexts  
+  - Use **blocks/calls** (Tooltip #3) as a sanity check
+
+### 8) “Which quarter/company should I investigate first?”
+- **Where to look:** Trend line + **Tooltip #3 extremes**
+- **How to decide quickly:**  
+  - pick the quarter with the biggest QoQ swing  
+  - confirm it has enough blocks/calls  
+  - grab the **Worst CallKey** and review the transcript context for that call
 
 ---
 
@@ -460,6 +586,10 @@ These are the “money shots” — they prove the dashboard is interactive and 
    - “Is sentiment moving?”
    - “Is leadership credibility aligned with analysts?”
    - “Where are the outliers and how confident are we?”
+
+This report is designed with one goal:
+
+> **Keep the main page clean and executive-friendly — push the deep diagnostics into interactive tooltips.**
 
 ---
 
