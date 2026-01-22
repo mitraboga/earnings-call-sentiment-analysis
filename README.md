@@ -1,10 +1,10 @@
-# 📞 S&P 500 Earnings Call Sentiment Analysis (VADER + FinBERT) → Power BI Intelligence Dashboard
+# 📞 S&P 500 Earnings Call Sentiment Analysis (VADER + FinBERT) 
 
 Turn raw earnings-call transcripts into **decision-grade sentiment metrics** that quantify how **management, analysts, and the market narrative** evolve over time.
 
 This repository builds an end-to-end NLP pipeline that produces:
 - ✅ **Clean speaker-level text blocks**
-- ✅ **Speaker role labeling** (Management / Analyst / Operator / Other)
+- ✅ **Speaker role labelling** (Management / Analyst / Operator / Other)
 - ✅ **Dual-model sentiment scoring**
   - **VADER** (fast, rule-based baseline)
   - **FinBERT** (finance-domain transformer)
@@ -41,7 +41,7 @@ This repo demonstrates the core value loop:
 
 **Raw text → structured speaker blocks → model scoring → aggregated KPIs → business dashboard**
 
-That’s exactly how NLP engineers turn unstructured language into **measurable metrics** that guide decisions.
+That’s exactly how NLP engineers turn unstructured language into **measurable metrics** that guide decisions. As an aspiring engineer myself, I ensured to follow this core value loop!
 
 ---
 
@@ -143,7 +143,7 @@ What preprocessing does (technical):
 - Extracts speaker blocks from common keys (segments/blocks/content/dialogue)
 - Cleans text:
   - lowercasing
-  - removes “forward-looking statements” and “safe harbor” sections
+  - removes “forward-looking statements” and “safe harbour” sections
   - strips non-alphabet characters
   - lemmatizes with spaCy
   - removes stopwords
@@ -217,39 +217,6 @@ Merge method:
 
 ---
 
-### Step 6 — Build Power BI metric tables (call-level + role-level)
-    python features/aggregate_for_powerbi.py
-
-Outputs:
-- data/processed/powerbi_call_level_metrics.csv
-- data/processed/powerbi_role_level_metrics.csv
-
-FinBERT → numeric mapping (for aggregation and easy charting):
-- positive → +1
-- neutral  → 0
-- negative → -1
-
-Role-level metrics (granularity: call + speaker_role):
-- blocks
-- avg_block_len
-- vader_mean, vader_median
-- finbert_mean
-- finbert_pos / finbert_neg / finbert_neu (as proportions)
-- finbert_avg_conf
-
-Call-level metrics (granularity: call):
-- total_blocks
-- avg_block_len
-- vader_mean
-- finbert_mean
-- finbert_pos / finbert_neg / finbert_neu
-- finbert_avg_conf
-- management vs analyst gaps (if both roles exist):
-  - vader_gap_mgmt_minus_analyst
-  - finbert_gap_mgmt_minus_analyst
-
----
-
 ## 📊 Power BI Dashboard — *Earnings Call Sentiment Analysis (Executive Overview)*
 
 The Python pipeline produces sentiment metrics — but the **Power BI report is the “decision layer”** that makes those metrics usable in real business workflows.
@@ -292,7 +259,7 @@ The banner is the “exec summary” for the current filter context:
 - **Avg VADER**
 - **Avg Confidence**
 
-Example shown in your screenshot context (AAPL):
+Example shown in the screenshot (AAPL):
 - **Total Calls: 10**
 - **Avg FinBERT: 0.73**
 - **Avg VADER: 0.77**
@@ -302,7 +269,7 @@ Example shown in your screenshot context (AAPL):
 
 ## Exhibit 2 — The Data Backbone (Call-Level vs Role-Level Tables)
 
-These are the two tables your Python pipeline exports and Power BI consumes:
+These are the two tables that my Python pipeline exports and my Power BI dashboard consumes:
 
 <details>
   <summary><b>Click to expand (Tables)</b></summary>
@@ -316,7 +283,7 @@ These are the two tables your Python pipeline exports and Power BI consumes:
   <img src="assets/powerbi/table_role_level.png" width="1000" />
 </details>
 
-### Call-Level table includes
+### Call-Level table includes:
 - volume context (**total_blocks**, **avg_block_len**)
 - sentiment aggregates (**vader_mean**, **finbert_mean**)
 - mix metrics (**finbert_pos / finbert_neu / finbert_neg**)
@@ -324,7 +291,7 @@ These are the two tables your Python pipeline exports and Power BI consumes:
 - divergence signals (**vader_gap_mgmt_minus_analyst**, **finbert_gap_mgmt_minus_analyst**)
 - traceability ID (**CallKey**) used in tooltips for “best/worst call” surfacing
 
-### Role-Level table includes
+### Role-Level table includes:
 - role splits (**Analyst / Management / Operator**)
 - section splits (**Prepared Remarks / Q&A**)
 - role-level sentiment means + medians (e.g., **vader_median**)
@@ -332,7 +299,7 @@ These are the two tables your Python pipeline exports and Power BI consumes:
 
 ---
 
-## Exhibit 3 — Model View (and why the tooltips work)
+## Exhibit 3 — Model View (why the tooltips work)
 
 <details>
   <summary><b>Click to expand (Relational Model)</b></summary>
@@ -348,13 +315,13 @@ These are the two tables your Python pipeline exports and Power BI consumes:
 - Several small **tooltip helper tables** (TT_*) exist purely to power tooltip layouts:
   - `TT Role`, `TT Sentiment`, `TT Axis`, `TT Extremes`
 
-This structure lets you build tooltips that feel like “mini dashboards” without polluting the main model.
+This structure allows my tooltips to act as “mini dashboards” without polluting my main model's more minimal overview for a cursory analysis.
 
 ---
 
 # ⭐ The Real Differentiator: Tooltips That Think
 
-You built **3 tooltip pages** that activate on hover from the main dashboard.
+I built **3 tooltip pages** that activate on hover from the main dashboard.
 These tooltips don’t just repeat visible charts — they provide **diagnostics**:
 - role divergence
 - percentile ranking
@@ -420,7 +387,7 @@ A divergence between Management and Analysts can signal:
 - A mini chart: **Δ vs Company Baseline**
   (how the current context differs from the company’s normal tone)
 
-Example interaction (AAPL • All • Positive):
+Example shown:
 - **+ve Label: 86%**
 - **Neutral Label: 1%**
 - **-ve Label: 13%**
@@ -459,7 +426,7 @@ It tells you if the tone is *actually unusual* or just “business as usual” f
   - `Best` + `Worst` surfaced using **Extreme CallKey**
   - includes FinBERT label strength + traceability
 
-Example shown in tooltip page:
+Example shown:
 - **FinBERT QoQ Δ: +0.80**
 - **VADER QoQ Δ: +0.84**
 - **5,513 blocks**
