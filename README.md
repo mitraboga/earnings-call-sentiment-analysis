@@ -452,14 +452,14 @@ These three screenshots show the tooltips activating directly from the Executive
   <summary><b>Click to expand (Tables)</b></summary>
   <br/>
 
-  <b>Call-Level Metrics Table (one row per earnings call)</b><br/>
+  <b>Tooltip #1 Interaction</b><br/>
   <img src="assets/powerbi/interaction_role_gap.png" width="1000" />
   <br/><br/>
 
-  <b>Role-Level Metrics Table (one row per call + role + section)</b><br/>
+  <b>Tooltip #2 Interaction</b><br/>
   <img src="assets/powerbi/tooltip_interaction_baseline.png" width="1000" />
 
-  <b>Role-Level Metrics Table (one row per call + role + section)</b><br/>
+  <b>Tooltip #3 Interaction</b><br/>
   <img src="assets/powerbi/interaction_extremes.png" width="1000" />
 </details>
 
@@ -593,10 +593,14 @@ VADER duplicate protection:
 
 <p align="center">
   <b style="font-size:18px;">Mitra Boga</b><br/><br/>
-  <a href="https://www.linkedin.com/in/bogamitra/" target="_blank">
-    <img src="https://img.shields.io/badge/LinkedIn-bogamitra-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" />
+
+  <!-- LinkedIn: true blue label + lighter-blue username block -->
+  <a href="https://www.linkedin.com/in/bogamitra/" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/LinkedIn-bogamitra-4DA3FF?style=for-the-badge&logo=linkedin&logoColor=white&labelColor=0A66C2" />
   </a>
-  <a href="https://x.com/techtraboga" target="_blank">
-    <img src="https://img.shields.io/badge/X-@techtraboga-111111?style=for-the-badge&logo=x&logoColor=white" />
+
+  <!-- X: near-black label + darker-gray username block (dark-mode friendly) -->
+  <a href="https://x.com/techtraboga" target="_blank" rel="noopener noreferrer">
+    <img src="https://img.shields.io/badge/X-@techtraboga-3A3F45?style=for-the-badge&logo=x&logoColor=white&labelColor=111418" />
   </a>
 </p>
