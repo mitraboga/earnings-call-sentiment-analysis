@@ -45,7 +45,7 @@ That’s exactly how NLP engineers turn unstructured language into **measurable 
 
 ---
 
-## Repo Structure (matches your actual repo)
+## Repo Structure
 
 ```text
 .
@@ -110,7 +110,7 @@ So install it (and ideally add it to requirements.txt):
     pip install datasets
 
 ### 3) Install spaCy model
-Your preprocessing uses:
+preprocessing uses:
     spacy.load("en_core_web_sm", disable=["parser", "ner"])
 
 Install:
@@ -194,8 +194,8 @@ Required columns (used downstream):
 - finbert_confidence  (confidence score)
 
 IMPORTANT:
-- Your merge + aggregation scripts assume the file/columns above exist.
-- If your current `sentiment_finbert.py` is not producing them yet, implement/update it so it writes:
+- merge + aggregation scripts assume the file/columns above exist.
+- If the current `sentiment_finbert.py` is not producing them yet, implement/update it so it writes:
   data/processed/speaker_blocks_with_finbert.csv
 
 ---
@@ -223,7 +223,7 @@ The Python pipeline produces sentiment metrics — but the **Power BI report is 
 
 This project isn’t just NLP in Python — the **Power BI layer is where raw text becomes decisions**.
 
-The dashboard turns thousands of earnings-call speaker blocks into **executive-ready KPIs**, letting you:
+The dashboard turns thousands of earnings-call speaker blocks into **executive-ready KPIs**, allowing business analysts to:
 - spot **sentiment shifts** over time (quarter-to-quarter),
 - compare **Management vs Analyst tone** (credibility vs skepticism),
 - separate **Prepared Remarks vs Q&A** (scripted vs spontaneous),
@@ -583,7 +583,7 @@ Hugging Face datasets missing:
     pip install datasets
 
 VADER duplicate protection:
-- If you want a clean rebuild, delete:
+- For a clean rebuild, delete:
   - data/processed/speaker_blocks_with_vader.csv
   - data/processed/vader_checkpoint.txt
 
