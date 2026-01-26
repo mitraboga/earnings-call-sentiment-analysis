@@ -217,7 +217,7 @@ Merge method:
 
 ---
 
-## 📊 Power BI Dashboard — *Earnings Call Sentiment Analysis (Executive Overview)*
+## 📊 Power BI Dashboard — *Executive Overview*
 
 The Python pipeline produces sentiment metrics — but the **Power BI report is the “decision layer”** that makes those metrics usable in real business workflows.
 
