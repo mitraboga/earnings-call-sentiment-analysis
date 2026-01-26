@@ -319,7 +319,7 @@ This structure allows my tooltips to act as “mini dashboards” without pollut
 
 ---
 
-# ⭐ The Real Differentiator: Tooltips That Think
+# 🔎 The Real Differentiator: Tooltips That Think
 
 I built **3 tooltip pages** that activate on hover from the main dashboard.
 These tooltips don’t just repeat visible charts — they provide **diagnostics**:
